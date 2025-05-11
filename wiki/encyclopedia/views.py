@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 import markdown2 as markdown
 from . import util
+import random
 
 
 def index(request):
@@ -37,3 +38,21 @@ def new_entry(request):
         util.save_entry(title, content)
         return redirect('index')
     return render(request, "encyclopedia/new_entry.html")
+
+def edit_entry(request, title):
+    old_content = util.get_entry(title)
+    if request.method == "POST":
+        title = request.POST['title']
+        content = request.POST['content']
+        util.save_entry(title, content)
+        return redirect('index')
+    
+    return render(request, "encyclopedia/edit_entry.html", {
+        "title": title,
+        "content": old_content
+    })
+
+def random_entry(request):
+    entries = util.list_entries()
+    random_title = random.choice(entries)
+    return redirect('entry', title=random_title)
