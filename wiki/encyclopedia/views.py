@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 import markdown2 as markdown
 from . import util
+import random
 
 
 def index(request):
@@ -50,3 +51,8 @@ def edit_entry(request, title):
         "title": title,
         "content": old_content
     })
+
+def random_entry(request):
+    entries = util.list_entries()
+    random_title = random.choice(entries)
+    return redirect('entry', title=random_title)
