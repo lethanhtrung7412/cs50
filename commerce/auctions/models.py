@@ -13,16 +13,19 @@ class TimeStampedModel(models.Model):
     class Meta:
         abstract = True
 
+class Category(TimeStampedModel):
+    name = models.CharField()
+
 class Listing(TimeStampedModel):
     product_name = models.CharField()
     img = models.URLField()
-    bid_price = models.FloatField(max_digits=10, decimal_places=2)
+    bid_price = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True)
-    category = models
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="categories")
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
 
 class Bidding(TimeStampedModel):
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=5, decimal_places=2)
     bidder_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
     item_bidding = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="bids")
 
