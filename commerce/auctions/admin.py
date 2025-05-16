@@ -4,3 +4,4 @@ from . import models
 admin.site.register(models.Listing)
 admin.site.register(models.Comment)
 admin.site.register(models.Bidding)
+admin.site.register(models.Category)

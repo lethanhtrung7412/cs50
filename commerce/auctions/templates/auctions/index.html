@@ -3,5 +3,16 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    {% if listings %}
+        {% for listing in listings %}
+            <div class="listing">
+                <h3>{{ listing.product_name }}</h3>
+                <p>{{ listing.description }}</p>
+                <p>Current Bid: ${{ listing.current_bid }}</p>
+                {% comment %} <a href="{% url 'listing' listing.id %}">View Listing</a> {% endcomment %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No active listings available.</p>
+    {% endif %}
 {% endblock %}
