@@ -1,3 +1,40 @@
 body {
     padding: 10px;
 }
+
+.listings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1rem auto;
+}
+
+.card {
+    display: flex;
+    flex-direction: row;;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    gap: 1.5rem;
+}
+
+.card img {
+    max-width: 150px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-content h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.card-content p {
+    margin: 0.3em 0;
+}

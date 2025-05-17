@@ -10,11 +10,15 @@ from .forms import ListingForm
 
 def index(request):
     listing = Listing.objects.all()
-    print(listing[0].product_name)
     return render(request, "auctions/index.html", {
         "listings": listing
     })
 
+def detail_listing(request, id):
+    data = Listing.objects.get(id=id)
+    return render(request, "auctions/detail.html", {
+        "listing": data
+    })
 
 def login_view(request):
     if request.method == "POST":
