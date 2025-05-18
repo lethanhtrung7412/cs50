@@ -1,5 +1,5 @@
 from django import forms
-from .models import Category, Listing
+from .models import Category, Listing, Bidding
 
 class CategoryForm(forms.Form):
     category_name = forms.CharField(label="Name")

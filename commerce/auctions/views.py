@@ -5,19 +5,47 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Listing
+from .models import User, Listing, Category, Bidding
 from .forms import ListingForm
 
 def index(request):
-    listing = Listing.objects.all()
+    listing = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "listings": listing
     })
 
 def detail_listing(request, id):
     data = Listing.objects.get(id=id)
+    nums_bid = Bidding.objects.filter(item_bidding=id).count()
     return render(request, "auctions/detail.html", {
-        "listing": data
+        "listing": data,
+        "nums_of_bid": nums_bid,
+    })
+
+def bidding(request, id):
+    listing = Listing.objects.get(id=id)
+    if request.method == "POST":
+        try:
+            new_bid_price = float(request.POST["bid_price"])
+        except (KeyError, ValueError):
+            return render(request, "auctions/detail.html", {
+                "listing": listing,
+                "error": "Invalid bid amount."
+            })
+        if new_bid_price > float(listing.bid_price):
+            bid = Bidding.objects.create(amount=new_bid_price, item_bidding=listing, bidder_id=request.user)
+            bid.save()
+            listing.bid_price = new_bid_price
+            listing.save()
+            return HttpResponseRedirect(reverse('detail_listing', args=[id]))
+        else:
+            return render(request, "auctions/detail.html", {
+                "listing": listing,
+                "error": "Your bid must be higher than the current price."
+            })
+
+    return render(request, "auctions/detail.html", {
+        "listing": listing
     })
 
 def login_view(request):
@@ -84,3 +112,10 @@ def create_listing(request):
         form = ListingForm()
 
     return render(request, "auctions/create_listing.html", {"form": form})
+
+def categories_listing(request):
+    categories = Category.objects.all()
+
+    return render(request, "auctions/categories.html",{
+        "categories": categories
+    })
