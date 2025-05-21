@@ -7,8 +7,7 @@
         <ul>
             {% for category in categories %}
                 <li>
-                    {% comment %} <a href="{% url 'category_listings' category.id %}">{{ category.name }}</a> {% endcomment %}
-                    {{ category.name }}
+                    <a href="{% url 'index' %}?category={{ category.name }}">{{ category.name }}</a>
                 </li>
             {% endfor %}
         </ul>

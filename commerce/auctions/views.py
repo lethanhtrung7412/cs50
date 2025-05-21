@@ -12,6 +12,8 @@ from .forms import ListingForm, CommentForm
 
 def index(request):
     listing = Listing.objects.filter(is_active=True)
+    if 'category' in request.GET:
+        listing = listing.filter(category__name=request.GET['category'])
     return render(request, "auctions/index.html", {
         "listings": listing
     })
@@ -55,16 +57,16 @@ def bidding(request, id):
 
 @login_required
 @require_POST
-def post_comment(request, listing_id):
+def post_comment(request, id):
     # Retrive the listing by id
     listing = get_object_or_404(
         Listing,
-        id=listing_id,
+        id=id,
         is_active=True
     )
-    form = CommentForm(data=request.Post)
+    form = CommentForm(data=request.POST)
     if form.is_valid():
-        comment = Comment.objects.create(content=form, listing=listing, comment_by=request.user)
+        comment = Comment.objects.create(content=form.cleaned_data['content'], listing=listing, comment_by=request.user)
         comment.save()
         return HttpResponseRedirect(reverse('detail_listing', args=[id]))
 

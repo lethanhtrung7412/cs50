@@ -21,7 +21,7 @@ class Listing(TimeStampedModel):
     img = models.URLField()
     bid_price = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="categories")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="categories", blank=True, null=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
 
 class Bidding(TimeStampedModel):

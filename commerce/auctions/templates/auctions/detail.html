@@ -32,5 +32,24 @@
             {% endif %}
         </ul>
     </div>
+    <div>
+        <form method="POST" action="{% url 'comment' listing.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea class="form-control" name="content" placeholder="Leave a comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Comment</button>
+        </form>
+        {% if comments %}
+            <h4>Comments</h4>
+            <ul>
+                {% for comment in comments %}
+                    <li>{{ comment.comment_by }}: {{ comment.content }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
+    </div>
     
 {% endblock body %}
