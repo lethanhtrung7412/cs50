@@ -12,3 +12,6 @@ class ListingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].label_from_instance = lambda obj: obj.name
+
+class CommentForm(forms.Form):
+    content = forms.CharField(label="Content")

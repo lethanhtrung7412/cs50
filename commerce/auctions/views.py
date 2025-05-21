@@ -4,9 +4,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
 
-from .models import User, Listing, Category, Bidding
-from .forms import ListingForm
+from .models import User, Listing, Category, Bidding,Comment
+from .forms import ListingForm, CommentForm
 
 def index(request):
     listing = Listing.objects.filter(is_active=True)
@@ -17,11 +19,14 @@ def index(request):
 def detail_listing(request, id):
     data = Listing.objects.get(id=id)
     nums_bid = Bidding.objects.filter(item_bidding=id).count()
+    comments = Comment.objects.filter(listing=id)
     return render(request, "auctions/detail.html", {
         "listing": data,
         "nums_of_bid": nums_bid,
+        "comments": comments
     })
 
+@login_required
 def bidding(request, id):
     listing = Listing.objects.get(id=id)
     if request.method == "POST":
@@ -43,6 +48,25 @@ def bidding(request, id):
                 "listing": listing,
                 "error": "Your bid must be higher than the current price."
             })
+
+    return render(request, "auctions/detail.html", {
+        "listing": listing
+    })
+
+@login_required
+@require_POST
+def post_comment(request, listing_id):
+    # Retrive the listing by id
+    listing = get_object_or_404(
+        Listing,
+        id=listing_id,
+        is_active=True
+    )
+    form = CommentForm(data=request.Post)
+    if form.is_valid():
+        comment = Comment.objects.create(content=form, listing=listing, comment_by=request.user)
+        comment.save()
+        return HttpResponseRedirect(reverse('detail_listing', args=[id]))
 
     return render(request, "auctions/detail.html", {
         "listing": listing

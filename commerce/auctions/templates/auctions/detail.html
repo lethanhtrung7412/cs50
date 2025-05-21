@@ -12,8 +12,10 @@
     <div>
         <form method="POST" action="{% url 'bidding' listing.id %}">
             {% csrf_token %}
-            <input type="number" name="bid_price" placeholder="Bid" required>
-            <button type="submit">Place Bid</button>
+            <div class="form-group">
+                <input type="number" class="form-control" name="bid_price" placeholder="Bid" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Place Bid</button>
         </form>
         {% if error %}
             <p style="color: red;">{{ error }}</p>        
@@ -21,11 +23,14 @@
     </div>
     <div>
         <h4>Details</h4>
-        <p>Listed by: {{ listing.seller }}</p>
-        {% if listing.category %}
-            <p>Category: {{ listing.category.name }}</p>
-        {% else %}
-            <p>Category: No Category Listed</p>
-        {% endif %}
+        <ul>
+            <li>Listed by: {{ listing.seller }}</li>
+            {% if listing.category %}
+                <li>Category: {{ listing.category.name }}</li>
+            {% else %}
+                <li>Category: No Category Listed</li>
+            {% endif %}
+        </ul>
     </div>
+    
 {% endblock body %}
