@@ -1,43 +1,56 @@
-document.addEventListener('DOMContentLoaded', function() {
-
+document.addEventListener("DOMContentLoaded", function () {
   // Use buttons to toggle between views
-  document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
-  document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
-  document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email);
+  document
+    .querySelector("#inbox")
+    .addEventListener("click", () => load_mailbox("inbox"));
+  document
+    .querySelector("#sent")
+    .addEventListener("click", () => load_mailbox("sent"));
+  document
+    .querySelector("#archived")
+    .addEventListener("click", () => load_mailbox("archive"));
+  document.querySelector("#compose").addEventListener("click", compose_email);
 
   // By default, load the inbox
-  load_mailbox('inbox');
+  load_mailbox("inbox");
 });
 
 function compose_email() {
-
   // Show compose view and hide other views
-  document.querySelector('#emails-view').style.display = 'none';
-  document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#compose-view").style.display = "block";
 
   // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
-
-  
+  document.querySelector("#compose-recipients").value = "";
+  document.querySelector("#compose-subject").value = "";
+  document.querySelector("#compose-body").value = "";
 }
 
 function load_mailbox(mailbox) {
-  let mailbox_result = fetch(`http://127.0.0.1:8000/emails/${mailbox}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then(response => response.json()
-  ).then(emails => {console.log(emails)})
-
-  
   // Show the mailbox and hide other views
-  document.querySelector('#emails-view').style.display = 'block';
-  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector("#emails-view").style.display = "block";
+  document.querySelector("#compose-view").style.display = "none";
 
   // Show the mailbox name
-  document.querySelector('#emails-view').innerHTML = mailbox_result;
+  document.querySelector("#emails-view").innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  fetch(`http://127.0.0.1:8000/emails/${mailbox}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      data.forEach(element => {
+        const emailElement = document.createElement("div");
+        emailElement.className = "email-item";
+        emailElement.innerHTML = `
+          <strong>From:</strong> ${element.sender} <br>
+          <strong>Subject:</strong> ${element.subject} <br>
+          <strong>Date:</strong> ${element.timestamp}
+        `;
+        document.querySelector("#emails-view").appendChild(emailElement);
+      });
+    });
 }
