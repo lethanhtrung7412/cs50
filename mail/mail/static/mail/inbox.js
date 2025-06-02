@@ -15,17 +15,33 @@ document.addEventListener("DOMContentLoaded", function () {
   load_mailbox("inbox");
 });
 
-function compose_email(recipients = "", subject = "", body = "") {
+function compose_email() {
   // Show compose view and hide other views
   document.querySelector("#detail-email-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "none";
   document.querySelector("#compose-view").style.display = "block";
-
   // Clear out composition fields
-  document.querySelector("#compose-recipients").value = recipients;
-  document.querySelector("#compose-subject").value = subject;
-  document.querySelector("#compose-body").value = body;
+  document.querySelector("#compose-recipients").value = "";
+  document.querySelector("#compose-subject").value = "";
+  document.querySelector("#compose-body").value = "";
 
+  // Add event listener for the send button
+  document.querySelector("#compose-send").addEventListener("click", function () {
+    const recipients = document.querySelector("#compose-recipients").value;
+    const subject = document.querySelector("#compose-subject").value;
+    const body = document.querySelector("#compose-body").value;
+    fetch("http://127.0.0.1:8000/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recipients: recipients,
+        subject: subject,
+        body: body
+      })
+    }).then((response) => response.json()).then((data) => console.log(data));
+  });
 }
 
 function load_mailbox(mailbox) {
@@ -86,8 +102,7 @@ function load_detail(email_id) {
     headers: {
       "Content-Type": "application/json",
     },
-  })
-    .then((response) => response.json())
+  }).then((response) => response.json())
     .then((data) => {
         console.log(data)
         const emailElement = document.createElement("div");
@@ -98,14 +113,23 @@ function load_detail(email_id) {
             <strong>To:</strong>  ${data.recipients.join(", ")} <br \>
             <strong>Title:</strong> ${data.subject} <br \>
             <strong>Timestamp: </strong> ${data.timestamp}
-
           </div>
+          <button id="reply-button" class="btn btn-sm btn-outline-primary">Reply</button>
           <hr \>
           <div>
             ${data.body}
           </div>
         `;
         document.querySelector("#detail-email-view").replaceChild(emailElement, document.querySelector("#detail-email-view").firstChild);
-
+        document.querySelector("#reply-button").addEventListener("click", () => {
+          compose_email();
+          document.querySelector("#compose-recipients").value = data.sender;
+          if (data.subject.startsWith("Re: ")) {
+            document.querySelector("#compose-subject").value = data.subject;
+          } else {
+            document.querySelector("#compose-subject").value = `Re: ${data.subject}`;
+          }
+          document.querySelector("#compose-body").value = `On ${data.timestamp} ${data.sender} wrote: \n${data.body}`
+        })
     });
 }
