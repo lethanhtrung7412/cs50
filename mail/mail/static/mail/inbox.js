@@ -65,7 +65,8 @@ function load_mailbox(mailbox) {
         const emailElement = document.createElement("div");
         emailElement.className = "email-item";
         emailElement.style.padding = "5px";
-        emailElement.style.border = element.read ? "1px solid #000000" : "1px solid #0000ff";
+        emailElement.style.border = "1px solid #000000";
+        emailElement.style.backgroundColor = element.read ? "rgb(206, 206, 206)" : "#ffffff";
         emailElement.style.display = "flex";
         emailElement.style.justifyContent = "space-between";
         emailElement.innerHTML = `
@@ -109,18 +110,33 @@ function load_detail(email_id) {
         emailElement.className = "email-item";
         emailElement.innerHTML = `
           <div>
-            <strong>From:</strong> ${data.sender} <br \>
-            <strong>To:</strong>  ${data.recipients.join(", ")} <br \>
-            <strong>Title:</strong> ${data.subject} <br \>
+            <strong>From:</strong> ${data.sender} <br />
+            <strong>To:</strong>  ${data.recipients.join(", ")} <br />
+            <strong>Title:</strong> ${data.subject} <br />
             <strong>Timestamp: </strong> ${data.timestamp}
           </div>
           <button id="reply-button" class="btn btn-sm btn-outline-primary">Reply</button>
-          <hr \>
+          ${data.sender !== document.querySelector("#user-email").textContent ? `
+            <button id="archived-button" class="btn btn-sm btn-outline-primary">${data.archived ? "Unarchived" : "Archived"}</button>
+          ` : ""}
+          <hr />
           <div>
             ${data.body}
           </div>
         `;
         document.querySelector("#detail-email-view").replaceChild(emailElement, document.querySelector("#detail-email-view").firstChild);
+        document.querySelector("#archived-button").addEventListener("click", () => {
+          fetch(`http://127.0.0.1:8000/emails/${email_id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              archived: !data.archived
+            })
+          })
+          load_mailbox("inbox");
+        })
         document.querySelector("#reply-button").addEventListener("click", () => {
           compose_email();
           document.querySelector("#compose-recipients").value = data.sender;
